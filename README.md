@@ -1,1 +1,1 @@
-# Standard-input-output
+Стандартный ввод-вывод
