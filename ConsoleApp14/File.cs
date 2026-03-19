@@ -5,20 +5,20 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 [Serializable]
 public class SimpleTextFile {
-  public string Path { get; set; }
+  public string FilePath { get; set; }
   public string Content { get; set; }
 
   public SimpleTextFile(string path, string content = "") {
-    Path = path;
+    FilePath = path;
     Content = content;
   }
 
   public void Save() {
-    File.WriteAllText(Path, Content);
+    File.WriteAllText(FilePath, Content);
   }
 
   public void Load() {
-    Content = File.ReadAllText(Path);
+    Content = File.ReadAllText(FilePath);
   }
 
   public void SerializeBinary(string filePath) {
@@ -33,7 +33,7 @@ public class SimpleTextFile {
       BinaryFormatter formatter = new BinaryFormatter();
       SimpleTextFile tempFile = (SimpleTextFile)formatter.Deserialize(stream);
       
-      this.Path = tempFile.Path;
+      this.FilePath = tempFile.FilePath;
       this.Content = tempFile.Content;
     }
   }
@@ -50,7 +50,7 @@ public class SimpleTextFile {
     using (TextReader reader = new StreamReader(filePath)) {
       SimpleTextFile tempFile = (SimpleTextFile)serializer.Deserialize(reader);
         
-      this.Path = tempFile.Path;
+      this.FilePath = tempFile.FilePath;
       this.Content = tempFile.Content;
     }
   }

@@ -97,6 +97,7 @@ public class TextEditor {
       Console.WriteLine($"Error saving XML file: {ex.Message}");
     }
   }
+
   public void DeserializeXml(string filePath) {
     try {
       using (TextReader reader = new StreamReader(filePath)) {
@@ -107,9 +108,7 @@ public class TextEditor {
         Console.WriteLine($"XML file loaded: {filePath}");
         Console.WriteLine($"Current content:\n{_currentFile.Content}");
       }
-    } 
-    
-    catch (Exception ex) {
+    } catch (Exception ex) {
       Console.WriteLine($"Error loading XML file: {ex.Message}");
     }
   }
