@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class SimpleIndexer {
-  // Создаём индекс: какое слово в каких файлах встречается
+public class FileIndexer {
   public Dictionary<string, List<string>> CreateIndex(string directory, List<string> keywords) {
     Dictionary<string, List<string>> index = new Dictionary<string, List<string>>();
-    SimpleSearcher searcher = new SimpleSearcher();
+    FileSearcher searcher = new FileSearcher();
 
     foreach (string word in keywords) {
       List<string> filesWithWord = searcher.FindFilesWithKeywords(directory, new List<string> { word });
@@ -16,13 +15,13 @@ public class SimpleIndexer {
   }
 
   public void DisplayIndex(Dictionary<string, List<string>> index) {
-    Console.WriteLine("\n=== РЕЗУЛЬТАТЫ ИНДЕКСАЦИИ ===");
+    Console.WriteLine("\n=== RESULTS OF INDEXATION ===");
 
     foreach (var entry in index) {
-      Console.WriteLine($"\nСлово '{entry.Key}' найдено в:");
+      Console.WriteLine($"\nWord '{entry.Key}' found in:");
 
       if (entry.Value.Count == 0) {
-        Console.WriteLine("  — нигде не найдено");
+        Console.WriteLine("  — not found anywhere");
       } else {
         foreach (string filePath in entry.Value) {
           Console.WriteLine($"  - {filePath}");

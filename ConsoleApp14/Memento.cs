@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 
-public class TextFileState {
+public class TextFileMemento {
   public string SavedContent { get; private set; }
 
-  public TextFileState(string content) {
+  public TextFileMemento(string content) {
     SavedContent = content;
   }
 }
 
 public class UndoableTextFile : SimpleTextFile {
-  private Stack<TextFileState> _history = new Stack<TextFileState>();
+  private Stack<TextFileMemento> _history = new Stack<TextFileMemento>();
   public UndoableTextFile(string path, string content = "") : base(path, content) { }
 
   private void SaveState() {
-    _history.Push(new TextFileState(Content));
+    _history.Push(new TextFileMemento(Content));
   }
 
   public void ChangeContent(string newContent) {
@@ -27,7 +27,7 @@ public class UndoableTextFile : SimpleTextFile {
     if (_history.Count == 0)
       return false;  
 
-    TextFileState previousState = _history.Pop();
+    TextFileMemento previousState = _history.Pop();
     Content = previousState.SavedContent;
     return true;
   }

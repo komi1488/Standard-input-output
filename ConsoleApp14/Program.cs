@@ -2,8 +2,8 @@
 
 class Program {
   public static void Main(string[] args) {
-    Console.WriteLine("=== ПРОСТОЙ ТЕКСТОВЫЙ РЕДАКТОР ===");
-    SimpleEditor editor = new SimpleEditor();
+    Console.WriteLine("=== SIMPLE TEXT EDITOR ===");
+    TextEditor editor = new TextEditor();
     editor.ShowMenu();
    } 
 }

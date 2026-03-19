@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-public class SimpleSearcher {
+public class FileSearcher {
   public List<string> FindFilesWithKeywords(string directory, List<string> keywords) {
     List<string> foundFiles = new List<string>();
     string[] allFiles = Directory.GetFiles(directory, "*.txt");

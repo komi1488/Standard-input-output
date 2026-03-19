@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Xml.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
-public class SimpleEditor {
+public class TextEditor {
   private UndoableTextFile _currentFile;
 
   public void OpenFile(string filePath) {
     _currentFile = new UndoableTextFile(filePath);
     _currentFile.Load();
-    Console.WriteLine("Файл открыт. Текущее содержимое:");
-    Console.WriteLine(_currentFile.Content);
+    Console.WriteLine("The file is open. Current content:" + _currentFile.Content);
   }
 
   public void EditFile() {
-    Console.WriteLine("Введите новый текст (в конце напишите 'SAVE'):");
+    Console.WriteLine("Enter a new text (write at the end 'SAVE'):");
     List<string> lines = new List<string>();
 
     string line;
@@ -23,58 +25,89 @@ public class SimpleEditor {
 
     string newContent = string.Join("\n", lines);
     _currentFile.ChangeContent(newContent);
-    Console.WriteLine("Текст изменён!");
+    Console.WriteLine("The text has been changed!");
   }
+  
+  public void DeserializeBinary(string filePath) { 
+    try { 
+      using (FileStream stream = new FileStream(filePath, FileMode.Open)) { 
+        BinaryFormatter formatter = new BinaryFormatter();
+        UndoableTextFile tempFile = (UndoableTextFile)formatter.Deserialize(stream);
 
+         _currentFile.Path = tempFile.Path;
+         _currentFile.ChangeContent(tempFile.Content);
+         Console.WriteLine($"Binary data loaded into current file: {filePath}");
+      }
+    }
+    catch (Exception ex) { 
+      Console.WriteLine($"Error loading binary file: {ex.Message}");
+    }
+  }
   public void Undo() {
     if (_currentFile.UndoLastChange()) {
-      Console.WriteLine("Откат выполнен. Новое содержимое:");
+      Console.WriteLine("Rollback complete. New content:");
       Console.WriteLine(_currentFile.Content);
     } else {
-      Console.WriteLine("Нет изменений для отката.");
+      Console.WriteLine("There are no changes to roll back.");
     }
   }
   
   public void SearchByKeywords() {
-    SimpleIndexer indexer = new SimpleIndexer();
+    FileIndexer indexer = new FileIndexer();
 
-    Console.Write("Введите путь к папке для поиска: ");
+    Console.Write("Enter the path to the folder to search for: ");
     string directory = Console.ReadLine();
 
-    Console.Write("Введите ключевые слова для поиска (через пробел): ");
+    Console.Write("Enter the search keywords (separated by spaces): ");
     string input = Console.ReadLine();
     List<string> keywords = input.Split(' ').ToList();
-
     try {
-        Dictionary<string, List<string>> index = indexer.CreateIndex(directory, keywords);
-
-        indexer.DisplayIndex(index);
+      Dictionary<string, List<string>> index = indexer.CreateIndex(directory, keywords);
+      indexer.DisplayIndex(index);
     } catch (Exception ex) {
-        Console.WriteLine($"Произошла ошибка при поиске: {ex.Message}");
+      Console.WriteLine($"An error occurred during the search: {ex.Message}");
+    }
+  }
+
+  public void DeserializeXml(string filePath) {
+    try {
+      using (TextReader reader = new StreamReader(filePath)) {
+        XmlSerializer serializer = new XmlSerializer(typeof(UndoableTextFile));
+        UndoableTextFile tempFile = (UndoableTextFile)serializer.Deserialize(reader);
+
+         _currentFile.Path = tempFile.Path;
+         _currentFile.ChangeContent(tempFile.Content);
+         Console.WriteLine($"XML data loaded into current file: {filePath}");
+      }
+    } 
+    
+    catch (Exception ex) {
+      Console.WriteLine($"Error loading XML file: {ex.Message}");
     }
   }
 
   public void SaveFile() {
     _currentFile.Save();
-    Console.WriteLine("Файл сохранён!");
+    Console.WriteLine("The file is saved!");
   }
 
   public void ShowMenu() {
     while (true) {
-      Console.WriteLine("\n=== Простой редактор ===");
-      Console.WriteLine("1 — Открыть файл");
-      Console.WriteLine("2 — Редактировать файл");
-      Console.WriteLine("3 — Отменить последнее изменение");
-      Console.WriteLine("4 — Поиск по ключевым словам");
-      Console.WriteLine("5 — Сохранить файл");
-      Console.WriteLine("6 — Выход");
-      Console.Write("Ваш выбор: ");
-
+      Console.WriteLine("\n=== Simple editor ===\n" 
+        + "1 — Open the file\n" 
+        + "2 — Edit the file\n" 
+        + "3 — Undo the last change\n" 
+        + "4 — Keyword search\n" 
+        + "5 — Load from binary\n"
+        + "6 — Load from XML\n"
+        + "7 — Save the file\n"
+        + "8 — Exit\n"
+        + "Your choice: ");
       string choice = Console.ReadLine();
 
       switch (choice) {
         case "1":
-          Console.Write("Путь к файлу: ");
+          Console.Write("The file path: ");
           OpenFile(Console.ReadLine());
           break;
         case "2":
@@ -87,14 +120,22 @@ public class SimpleEditor {
           SearchByKeywords();
           break;
         case "5":
-          SaveFile();
+          Console.Write("Enter path to binary file: ");
+          DeserializeBinary(Console.ReadLine());
           break;
         case "6":
-          Console.WriteLine("Программа завершается...");
+          Console.Write("Enter path to XML file: ");
+          DeserializeXml(Console.ReadLine());
+          break;
+        case "7":
+          SaveFile();
+          break;
+        case "8":
+          Console.WriteLine("The program is ending...");
           Environment.Exit(0);
           break;
         default:
-          Console.WriteLine("Неверный выбор, попробуйте снова.");
+          Console.WriteLine("Wrong choice, try again.");
           break;
       }
     }
