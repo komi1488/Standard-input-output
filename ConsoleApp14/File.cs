@@ -27,6 +27,7 @@ public class SimpleTextFile {
       formatter.Serialize(stream, this);
     }
   }
+
   public void DeserializeBinary(string filePath) { 
     using (FileStream stream = new FileStream (filePath, FileMode.Open)) { 
       BinaryFormatter formatter = new BinaryFormatter();
@@ -43,6 +44,7 @@ public class SimpleTextFile {
       serializer.Serialize(writer, this);
     }
   }
+
   public void DeserializeXml(string filePath) {
     XmlSerializer serializer = new XmlSerializer(typeof(SimpleTextFile));
     using (TextReader reader = new StreamReader(filePath)) {

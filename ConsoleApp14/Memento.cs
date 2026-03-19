@@ -18,14 +18,19 @@ public class UndoableTextFile : SimpleTextFile {
     _history.Push(new TextFileMemento(Content));
   }
 
+   public void ClearHistory() { 
+    _history.Clear(); 
+   }
+
   public void ChangeContent(string newContent) {
     SaveState();  
     Content = newContent;  
   }
 
   public bool UndoLastChange() {
-    if (_history.Count == 0)
+    if (_history.Count == 0) { 
       return false;  
+    }
 
     TextFileMemento previousState = _history.Pop();
     Content = previousState.SavedContent;
