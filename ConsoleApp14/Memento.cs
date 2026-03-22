@@ -1,39 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
+
+[Serializable]
 public class TextFileMemento {
-  public string SavedContent { get; private set; }
+	public string Content { get; private set; }
+	public DateTime Timestamp { get; private set; }
+	public string SavedContent { get; set; }
 
-  public TextFileMemento(string content) {
-    SavedContent = content;
-  }
+	public TextFileMemento(string content) {
+		Content = content;
+		Timestamp = DateTime.Now;
+	}
 }
 
-public class UndoableTextFile : SimpleTextFile {
-  private Stack<TextFileMemento> _history = new Stack<TextFileMemento>();
-  public UndoableTextFile(string path, string content = "") : base(path, content) { }
+public class UndoableTextFile : SimpleTextFile, IOriginator {
+	private Stack<TextFileMemento> _history = new Stack<TextFileMemento>();
 
-  private void SaveState() {
-    _history.Push(new TextFileMemento(Content));
-  }
+	public UndoableTextFile(string path, string content = "") : base(path, content) { }
 
-   public void ClearHistory() { 
-    _history.Clear(); 
-   }
+	object IOriginator.GetMemento() {
+		var memento = new TextFileMemento(Content);
+		_history.Push(memento);
+		return memento;
+	}
 
-  public void ChangeContent(string newContent) {
-    SaveState();  
-    Content = newContent;  
-  }
+	void IOriginator.SetMemento(object memento) {
+		if (memento is TextFileMemento textMemento) {
+			Content = textMemento.Content;
+			if (_history.Count > 0) _history.Pop();
+		} else {
+			throw new ArgumentException("Invalid memento type. Expected TextFileMemento.");
+		}
+	}
 
-  public bool UndoLastChange() {
-    if (_history.Count == 0) { 
-      return false;  
-    }
+	public void ClearHistory() {
+		_history.Clear();
+		Console.WriteLine("History cleared.");
+	}
 
-    TextFileMemento previousState = _history.Pop();
-    Content = previousState.SavedContent;
-    return true;
-  }
+	public void ChangeContent(string newContent) {
+		Content = newContent;
+	}
 }
+
+
